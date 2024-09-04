@@ -8,7 +8,7 @@ const Card = ({ style, ...rest }: CardProps) => {
   const colors = useColorsTheme();
   return (
     <View
-      style={[style, styles, { backgroundColor: colors["background"] }]}
+      style={[style, styles, { backgroundColor: colors.white }]}
       {...rest}
     />
   );
@@ -16,6 +16,7 @@ const Card = ({ style, ...rest }: CardProps) => {
 
 const styles = {
   borderRadius: 8,
+  overflow: "hidden",
   ...Shadows.dp2,
 } satisfies ViewStyle;
 

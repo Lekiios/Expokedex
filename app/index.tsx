@@ -1,15 +1,27 @@
 import Card from "@/components/Card";
 import PText from "@/components/PText";
+import PokemonCard from "@/components/PokemonCard";
+import { getPokemonId } from "@/functions/pokemon";
 import { useColorsTheme } from "@/hooks/useColorsTheme";
-import { Image, StyleSheet, View } from "react-native";
+import { useFetchQuery } from "@/hooks/useFetchQuery";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const colors = useColorsTheme();
 
+  const { data, isFetching } = useFetchQuery("/pokemon?limit=21");
+  const pokemons = data?.results || [];
+
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors["primary"] }]}
+      style={[styles.container, { backgroundColor: colors.primary }]}
     >
       <View style={styles.title}>
         <Image
@@ -21,7 +33,25 @@ const Home = () => {
           Pokédex
         </PText>
       </View>
-      <Card style={styles.body}></Card>
+      <Card style={styles.body}>
+        <FlatList
+          data={pokemons}
+          numColumns={3}
+          columnWrapperStyle={styles.gridGap}
+          contentContainerStyle={[styles.gridGap, styles.list]}
+          ListFooterComponent={
+            isFetching ? <ActivityIndicator color={colors.primary} /> : <></>
+          }
+          renderItem={({ item }) => (
+            <PokemonCard
+              style={{ flex: 1 / 3 }}
+              id={getPokemonId(item.url)}
+              name={item.name}
+            />
+          )}
+          keyExtractor={(item) => item.url}
+        />
+      </Card>
     </SafeAreaView>
   );
 };
@@ -39,6 +69,13 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    paddingTop: 12,
+  },
+  gridGap: {
+    gap: 8,
+  },
+  list: {
+    padding: 12,
   },
 });
 
