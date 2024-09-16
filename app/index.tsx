@@ -3,7 +3,7 @@ import PText from "@/components/PText";
 import PokemonCard from "@/components/PokemonCard";
 import { getPokemonId } from "@/functions/pokemon";
 import { useColorsTheme } from "@/hooks/useColorsTheme";
-import { useFetchQuery } from "@/hooks/useFetchQuery";
+import { useInfiniteFetchQuery } from "@/hooks/useFetchQuery";
 import {
   ActivityIndicator,
   FlatList,
@@ -16,8 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Home = () => {
   const colors = useColorsTheme();
 
-  const { data, isFetching } = useFetchQuery("/pokemon?limit=21");
-  const pokemons = data?.results || [];
+  const { data, isFetching, fetchNextPage } =
+    useInfiniteFetchQuery("/pokemon?limit=21");
+  const pokemons = data?.pages.flatMap((page) => page.results) || [];
 
   return (
     <SafeAreaView
@@ -42,6 +43,7 @@ const Home = () => {
           ListFooterComponent={
             isFetching ? <ActivityIndicator color={colors.primary} /> : <></>
           }
+          onEndReached={() => fetchNextPage()}
           renderItem={({ item }) => (
             <PokemonCard
               style={{ flex: 1 / 3 }}
